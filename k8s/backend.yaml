@@ -16,7 +16,7 @@ spec:
       containers:
       - name: backend
         # Using a stable placeholder which will be updated by Jenkins
-        image: REPLACE_ME_BACKEND_IMAGE 
+        image: pratham30/backend:v3 
         ports:
         - containerPort: 5000
         env:
