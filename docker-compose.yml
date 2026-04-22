@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:8.0
+    container_name: devops-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - mongo-data:/data/db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: devops-backend
+    ports:
+      - "5001:5000"
+    environment:
+      - MONGO_URI=mongodb://admin:password@mongo:27017/admin
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: devops-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_BACKEND_URL=http://localhost:5001
+    depends_on:
+      - backend
+
+volumes:
+  mongo-data:
