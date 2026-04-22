@@ -9,8 +9,8 @@ pipeline {
         
         // This dynamically generates a new tag for the containers every run (e.g., v15)
         IMAGE_TAG = "v${env.BUILD_NUMBER}"
-        FRONTEND_IMAGE = "pratham/frontend:${IMAGE_TAG}" // Your Repo
-        BACKEND_IMAGE = "pratham/backend:${IMAGE_TAG}"   // Your Repo
+        FRONTEND_IMAGE = "pratham30/frontend:${IMAGE_TAG}" // Your Repo
+        BACKEND_IMAGE = "pratham30/backend:${IMAGE_TAG}"   // Your Repo
     }
     
     stages {
