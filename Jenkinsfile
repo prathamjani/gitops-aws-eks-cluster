@@ -62,7 +62,7 @@ pipeline {
                         git config user.name "Jenkins CI"
                         git add k8s/backend.yaml k8s/frontend.yaml
                         git commit -m "Jenkins automatically updated application version to ${env.IMAGE_TAG} [skip ci]"
-                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/LondheShubham153/TWSThreeTierAppChallenge.git HEAD:main
+                        git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/prathamjani/gitops-aws-eks-cluster.git HEAD:main
                     """
                 }
             }
