@@ -16,7 +16,7 @@ spec:
       containers:
       - name: frontend
         # Using a stable placeholder which will be updated by Jenkins
-        image: pratham30/frontend:v5
+        image: pratham30/frontend:v6
         ports:
         - containerPort: 3000
         env:
