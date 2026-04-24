@@ -47,8 +47,10 @@ pipeline {
                 script {
                     // Replaces the placeholder text in our YAML files with the NEW image tags created in the stages above
                     sh """
-                        sed -i "s|image: REPLACE_ME_BACKEND_IMAGE|image: ${env.BACKEND_IMAGE}|g" k8s/backend.yaml
-                        sed -i "s|image: REPLACE_ME_FRONTEND_IMAGE|image: ${env.FRONTEND_IMAGE}|g" k8s/frontend.yaml
+                        sed -i -E "s|image: .*/backend:.*|image: ${env.BACKEND_IMAGE}|g" k8s/backend.yaml || true
+                        sed -i -E "s|image: .*/frontend:.*|image: ${env.FRONTEND_IMAGE}|g" k8s/frontend.yaml || true
+                        sed -i "s|image: REPLACE_ME_BACKEND_IMAGE|image: ${env.BACKEND_IMAGE}|g" k8s/backend.yaml || true
+                        sed -i "s|image: REPLACE_ME_FRONTEND_IMAGE|image: ${env.FRONTEND_IMAGE}|g" k8s/frontend.yaml || true
                     """
                 }
             }
@@ -61,7 +63,7 @@ pipeline {
                         git config user.email "jenkins@example.com"
                         git config user.name "Jenkins CI"
                         git add k8s/backend.yaml k8s/frontend.yaml
-                        git commit -m "Jenkins automatically updated application version to ${env.IMAGE_TAG} [skip ci]"
+                        git commit -m "Jenkins automatically updated application version to ${env.IMAGE_TAG} [skip ci]" || echo "No changes to commit, skipping"
                         git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/prathamjani/gitops-aws-eks-cluster.git HEAD:main
                     """
                 }
