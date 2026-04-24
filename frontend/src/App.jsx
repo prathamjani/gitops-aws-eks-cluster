@@ -72,7 +72,7 @@ export default function App() {
           </div>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 pb-2">
-          ToDo App
+          ToDo App test
         </h1>
         <p className="text-slate-400 mt-2">
           {todos.length} Active Objectives | {completedCount} Completed
@@ -119,8 +119,8 @@ export default function App() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   className={`group flex items-center justify-between p-4 rounded-xl border transition-all ${todo.completed
-                      ? 'bg-emerald-900/10 border-emerald-500/20'
-                      : 'bg-slate-900/80 border-slate-700 hover:border-slate-500'
+                    ? 'bg-emerald-900/10 border-emerald-500/20'
+                    : 'bg-slate-900/80 border-slate-700 hover:border-slate-500'
                     }`}
                 >
                   <div className="flex items-center gap-4 cursor-pointer" onClick={() => toggleTodo(todo._id, todo.completed)}>
