@@ -72,7 +72,7 @@ export default function App() {
           </div>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 pb-2">
-          ToDo App test
+          ToDo App
         </h1>
         <p className="text-slate-400 mt-2">
           {todos.length} Active Objectives | {completedCount} Completed
