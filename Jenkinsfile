@@ -42,6 +42,16 @@ pipeline {
             }
         }
         
+        stage('Trivy Vulnerability Scan') {
+            steps {
+                script {
+                    // Scanning the recently built Docker images for HIGH and CRITICAL vulnerabilities before they are rolled out to Kubernetes
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL ${env.BACKEND_IMAGE}"
+                    sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --exit-code 0 --severity HIGH,CRITICAL ${env.FRONTEND_IMAGE}"
+                }
+            }
+        }
+        
         stage('Update Kubernetes Manifests') {
             steps {
                 script {
