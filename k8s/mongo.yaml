@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: three-tier-app
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-headless
+  namespace: three-tier-app
+spec:
+  clusterIP: None
+  selector:
+    app: mongo
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+  namespace: three-tier-app
+spec:
+  serviceName: "mongo-headless"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      volumes:
+      - name: mongo-keyfile
+        secret:
+          secretName: mongo-secret
+          defaultMode: 256
+          items:
+          - key: mongo-keyfile
+            path: mongo-keyfile
+      initContainers:
+      - name: init-keyfile
+        image: busybox
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 100m
+            memory: 128Mi
+        command:
+          - sh
+          - -c
+          - |
+            cp /tmp/mongo-keyfile /data/db/mongo-keyfile
+            chmod 400 /data/db/mongo-keyfile
+            chown 999:999 /data/db/mongo-keyfile
+        volumeMounts:
+        - name: mongo-keyfile
+          mountPath: /tmp/mongo-keyfile
+          subPath: mongo-keyfile
+        - name: mongo-storage
+          mountPath: /data/db
+      containers:
+      - name: mongo
+        image: mongo:8.0
+        ports:
+        - containerPort: 27017
+        args: ["--replSet", "rs0", "--bind_ip_all", "--keyFile", "/data/db/mongo-keyfile"]
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+        lifecycle:
+          postStart:
+            exec:
+              command:
+                - bash
+                - -c
+                - |
+                  (
+                    sleep 20; until mongosh --eval "db.adminCommand('ping')"; do sleep 2; done;
+                    if [ "$HOSTNAME" = "mongo-0" ]; then
+                      mongosh -u "$MONGO_INITDB_ROOT_USERNAME" -p "$MONGO_INITDB_ROOT_PASSWORD" --eval 'try { rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongo-0.mongo-headless:27017"}, {_id: 1, host: "mongo-1.mongo-headless:27017"}, {_id: 2, host: "mongo-2.mongo-headless:27017"}]}) } catch(e) {}' || mongosh --eval 'try { rs.initiate({_id: "rs0", members: [{_id: 0, host: "mongo-0.mongo-headless:27017"}, {_id: 1, host: "mongo-1.mongo-headless:27017"}, {_id: 2, host: "mongo-2.mongo-headless:27017"}]}) } catch(e) {}'
+                    fi
+                  ) &
+        env:
+        - name: MONGO_INITDB_ROOT_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-user
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mongo-secret
+              key: mongo-password
+        volumeMounts:
+        - name: mongo-storage
+          mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 2Gi

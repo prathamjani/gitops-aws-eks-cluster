@@ -1,0 +1,14 @@
+# Root-level ignore to prevent bloated context uploads if building from parent directory
+.git/
+.DS_Store
+.env
+.env.*
+node_modules/
+npm-debug.log
+yarn-error.log
+coverage/
+dist/
+build/
+terraform/.terraform/
+*.tfstate
+*.tfstate.backup

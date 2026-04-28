@@ -1,0 +1,19 @@
+
+services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile.jenkins
+    container_name: devops-jenkins
+    privileged: true
+    user: root # Needed to touch the docker.sock
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      # Mount the Docker VM socket so Jenkins can build images!
+      - /var/run/docker.sock:/var/run/docker.sock
+
+volumes:
+  jenkins_home:

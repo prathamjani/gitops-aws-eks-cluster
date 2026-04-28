@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.DS_Store
+.env
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.backup
+terraform/.terraform.lock.hcl
+k8s/secret.yaml
+k8s/secret.local.yaml
+k8s/secret.decrypted.yaml
+.tools/
